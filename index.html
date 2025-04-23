@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birthday Card with Confetti on Click</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #fceabb, #f8b500);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .card {
+      background: white;
+      width: 350px;
+      border-radius: 20px;
+      box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+      transform: rotateY(0deg);
+      transition: transform 0.5s ease;
+      perspective: 1000px;
+      z-index: 1;
+    }
+
+    .card:hover {
+      transform: rotateY(5deg);
+    }
+
+    .card img {
+      width: 100%;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+
+    .card-content {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .card-content h1 {
+      font-size: 24px;
+      margin: 10px 0;
+      color: #ff6f61;
+    }
+
+    .card-content p {
+      font-size: 16px;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    .card-content .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #ff6f61;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      box-shadow: 0 8px 15px rgba(255, 111, 97, 0.4);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .card-content .btn:hover {
+      background-color: #e65c50;
+      box-shadow: 0 12px 20px rgba(255, 111, 97, 0.6);
+    }
+
+    canvas#confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="card">
+    <img src="./birthday.jpg" alt="Birthday Image" />
+    <div class="card-content">
+      <h1>Happy Birthday!</h1>
+      <p>Wishing you a day filled with love, laughter, and joy. Have a fantastic celebration!</p>
+      <button class="btn" onclick="startConfetti()">Celebrate 🎉</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confetti = [];
+
+    function initConfetti() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      confetti = Array.from({ length: 150 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 40 + 10,
+        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+        tilt: Math.random() * 10 - 10,
+        tiltAngle: 0,
+        tiltAngleIncrement: Math.random() * 0.1 + 0.05,
+      }));
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(c => {
+        ctx.beginPath();
+        ctx.lineWidth = c.r;
+        ctx.strokeStyle = c.color;
+        ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.d / 2);
+        ctx.stroke();
+      });
+      updateConfetti();
+      requestAnimationFrame(drawConfetti);
+    }
+
+    function updateConfetti() {
+      confetti.forEach(c => {
+        c.y += Math.cos(c.d) + 2;
+        c.x += Math.sin(c.d);
+        c.tiltAngle += c.tiltAngleIncrement;
+        c.tilt = Math.sin(c.tiltAngle) * 15;
+
+        if (c.y > canvas.height) {
+          c.y = -20;
+          c.x = Math.random() * canvas.width;
+        }
+      });
+    }
+
+    function startConfetti() {
+      canvas.style.display = 'block';
+      initConfetti();
+      drawConfetti();
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
